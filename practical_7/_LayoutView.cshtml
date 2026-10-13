@@ -1,0 +1,34 @@
+﻿
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title - My ASP.NET Application</title>
+</head>
+<body>
+    <div>
+        <h1>Student Feedback Management System</h1>
+    </div>
+
+    <div>
+        <p>
+            <b>Marwadi University - Department of Computer Engineering</b>
+        </p>
+    </div>
+
+    <hr />
+
+    <div>
+        @Html.ActionLink("Home", "Index", "Feedback") |
+        @Html.ActionLink("Submit Feedback", "Create", "Feedback") |
+        @Html.ActionLink("View Feedback", "List", "Feedback")
+    </div>
+
+    <hr />
+
+    <div>
+        @RenderBody()
+    </div>
+
+</body>
+</html>
