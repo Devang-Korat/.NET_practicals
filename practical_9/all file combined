@@ -1,0 +1,277 @@
+Source: Companies.aspx
+Code:
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Companies.aspx.cs" Inherits="WebApplication12.Companies" %>
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title>Company Placement Details</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+
+        <h3>Placement Records</h3>
+
+        <asp:Repeater ID="rptCompanies" runat="server">
+            <HeaderTemplate>
+                <table border="1" cellpadding="5">
+                    <tr>
+                        <th>Placement ID</th>
+                        <th>Student ID</th>
+                        <th>Company</th>
+                        <th>Job Role</th>
+                        <th>Package (LPA)</th>
+                    </tr>
+            </HeaderTemplate>
+
+            <ItemTemplate>
+                <tr>
+                    <td><%# Eval("PlacementId") %></td>
+                    <td><%# Eval("StudentId") %></td>
+                    <td><%# Eval("CompanyName") %></td>
+                    <td><%# Eval("JobRole") %></td>
+                    <td><%# Eval("PackageLPA") %></td>
+                </tr>
+            </ItemTemplate>
+
+            <FooterTemplate>
+                </table>
+            </FooterTemplate>
+        </asp:Repeater>
+
+        <h3>Company Details Using DataList</h3>
+
+        <asp:DataList ID="dlPlacements" runat="server">
+            <ItemTemplate>
+                <p>
+                    Company: <%# Eval("CompanyName") %><br />
+                    Job Role: <%# Eval("JobRole") %><br />
+                    Package: <%# Eval("PackageLPA") %> LPA
+                </p>
+                <hr />
+            </ItemTemplate>
+        </asp:DataList>
+
+        <br />
+
+        <a href="Default.aspx">Back to Dashboard</a>
+
+    </form>
+</body>
+</html>
+                                                                                                                                                                                                               
+
+Source: Companies.aspx.cs
+Code:
+using System;
+using System.Configuration;
+using System.Data;
+using System.Data.SqlClient;
+using System.Web.UI;
+
+namespace WebApplication12
+{
+    public partial class Companies : System.Web.UI.Page
+    {
+        // Connection string
+        string cs = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\student\source\repos\WebApplication12\WebApplication12\App_Data\Database1.mdf;Integrated Security=True";
+
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            if (!IsPostBack)
+            {
+                LoadCompanies();
+                LoadPlacements();
+            }
+        }
+
+        private void LoadCompanies()
+        {
+            using (SqlConnection con = new SqlConnection(cs))
+            {
+                string query = "SELECT * FROM Students";
+
+                SqlDataAdapter da = new SqlDataAdapter(query, con);
+                DataTable dt = new DataTable();
+
+                da.Fill(dt);
+
+                rptCompanies.DataSource = dt;
+                rptCompanies.DataBind();
+            }
+        }
+
+        private void LoadPlacements()
+        {
+            using (SqlConnection con = new SqlConnection(cs))
+            {
+                string query = "SELECT * FROM Students";
+
+                SqlDataAdapter da = new SqlDataAdapter(query, con);
+                DataTable dt = new DataTable();
+
+                da.Fill(dt);
+
+                dlPlacements.DataSource = dt;
+                dlPlacements.DataBind();
+            }
+        }
+    }
+}
+Source: Default.aspx
+Code:
+<%@ Page Language="C#" AutoEventWireup="true"
+    CodeBehind="Default.aspx.cs"
+    Inherits="WebApplication12.Default" %>
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title>Placement Dashboard</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+
+        <h1>Placement Dashboard</h1>
+        <hr />
+
+        <h3>Placement Summary</h3>
+
+        <table border="1" cellpadding="8">
+            <tr>
+                <td>Total Students</td>
+                <td><asp:Label ID="lblTotal" runat="server" /></td>
+            </tr>
+            <tr>
+                <td>Placed Students</td>
+                <td><asp:Label ID="lblPlaced" runat="server" /></td>
+            </tr>
+            <tr>
+                <td>Unplaced Students</td>
+                <td><asp:Label ID="lblUnplaced" runat="server" /></td>
+            </tr>
+            <tr>
+                <td>Placement Percentage</td>
+                <td><asp:Label ID="lblPercentage" runat="server" /></td>
+            </tr>
+            <tr>
+                <td>Highest Package (LPA)</td>
+                <td><asp:Label ID="lblHighestPackage" runat="server" /></td>
+            </tr>
+        </table>
+
+        <h3>Student Placement Records</h3>
+
+        <asp:GridView ID="gvPlacements" runat="server"
+            AutoGenerateColumns="True"
+            EmptyDataText="No student records found.">
+        </asp:GridView>
+
+        <br />
+
+        <asp:HyperLink ID="lnkCompanies" runat="server"
+            NavigateUrl="~/Companies.aspx">
+            View Company Summary
+        </asp:HyperLink>
+
+        <br /><br />
+
+    </form>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+Source: Default.aspx.cs
+Code:
+
+using System;
+using System.Data;
+using System.Data.SqlClient;
+using System.Web.UI;
+
+namespace WebApplication12
+{
+    public partial class Default : System.Web.UI.Page
+    {
+        string cs = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\student\source\repos\WebApplication12\WebApplication12\App_Data\Database1.mdf;Integrated Security=True";
+
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            if (!IsPostBack)
+            {
+                LoadSummary();
+                LoadPlacements();
+            }
+        }
+
+        private void LoadSummary()
+        {
+            using (SqlConnection con = new SqlConnection(cs))
+            {
+                con.Open();
+
+                SqlCommand cmd = new SqlCommand(
+                    "SELECT COUNT(*) FROM Students", con);
+
+                int total = Convert.ToInt32(cmd.ExecuteScalar());
+                lblTotal.Text = total.ToString();
+
+                cmd.CommandText =
+                    "SELECT COUNT(DISTINCT StudentId) FROM Students";
+
+                int placed = Convert.ToInt32(cmd.ExecuteScalar());
+                lblPlaced.Text = placed.ToString();
+
+                int unplaced = total - placed;
+                lblUnplaced.Text = unplaced.ToString();
+
+                cmd.CommandText =
+                    "SELECT MAX(PackageLPA) FROM Students";
+
+                object result = cmd.ExecuteScalar();
+
+                decimal highest = (result == DBNull.Value || result == null)
+                    ? 0
+                    : Convert.ToDecimal(result);
+
+                lblHighestPackage.Text = highest.ToString("N2");
+
+                decimal percentage = total == 0
+                    ? 0
+                    : (decimal)placed * 100 / total;
+
+                lblPercentage.Text = percentage.ToString("N2") + "%";
+            }
+        }
+
+        private void LoadPlacements()
+        {
+            using (SqlConnection con = new SqlConnection(cs))
+            {
+                string query = "SELECT * FROM Students";
+
+                SqlDataAdapter da = new SqlDataAdapter(query, con);
+                DataTable dt = new DataTable();
+
+                da.Fill(dt);
+
+                gvPlacements.DataSource = dt;
+                gvPlacements.DataBind();
+            }
+        }
+
+        protected void btnReport_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("~/Companies.aspx");
+        }
+    }
+}
+
